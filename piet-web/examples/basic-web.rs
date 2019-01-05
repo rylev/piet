@@ -8,7 +8,7 @@ use stdweb::web::{document, window, CanvasRenderingContext2d};
 
 use stdweb::web::html_element::CanvasElement;
 
-use piet::{FillRule, FontBuilder, RenderContext, TextLayoutBuilder};
+use piet::{FillRule, FontBuilder, RenderContext, TextLayout, TextLayoutBuilder};
 use piet_web::WebRenderContext;
 
 fn draw_pretty_picture<R: RenderContext>(rc: &mut R) {
@@ -30,8 +30,16 @@ fn draw_pretty_picture<R: RenderContext>(rc: &mut R) {
 
     let font = rc.new_font_by_name("Segoe UI", 12.0).build();
     let layout = rc.new_text_layout(&font, "Hello piet-web!").build();
+    let w: f64 = layout.width().into();
     let brush = rc.solid_brush(0x80_00_00_C0);
     rc.draw_text(&layout, (80.0, 10.0), &brush);
+
+    rc.stroke(
+        &Line::new((80.0, 12.0), (80.0 + w, 12.0)),
+        &brush,
+        1.0,
+        None,
+    );
 }
 
 fn main() {
