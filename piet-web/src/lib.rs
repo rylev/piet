@@ -42,8 +42,8 @@ pub struct WebTextLayout {
     width: f64,
 }
 
-pub struct WebTextLayoutBuilder {
-    ctx: CanvasRenderingContext2d,
+pub struct WebTextLayoutBuilder<'a> {
+    ctx: &'a CanvasRenderingContext2d,
     font: WebFont,
     text: String,
 }
@@ -65,7 +65,7 @@ impl<'a> RenderContext for WebRenderContext<'a> {
     type F = WebFont;
     type FBuilder = WebFontBuilder;
     type TL = WebTextLayout;
-    type TLBuilder = WebTextLayoutBuilder;
+    type TLBuilder = WebTextLayoutBuilder<'a>;
 
     fn clear(&mut self, _rgb: u32) {
         // TODO: we might need to know the size of the canvas to do this.
@@ -110,9 +110,7 @@ impl<'a> RenderContext for WebRenderContext<'a> {
 
     fn new_text_layout(&mut self, font: &Self::F, text: &str) -> Self::TLBuilder {
         WebTextLayoutBuilder {
-            // TODO: it's very likely possible to do this without cloning ctx, but
-            // I couldn't figure out the lifetime errors from a `&'a` reference.
-            ctx: self.ctx.clone(),
+            ctx: self.ctx,
             font: font.clone(),
             text: text.to_owned(),
         }
@@ -213,7 +211,7 @@ impl WebFont {
     }
 }
 
-impl TextLayoutBuilder for WebTextLayoutBuilder {
+impl<'a> TextLayoutBuilder for WebTextLayoutBuilder<'a> {
     type Out = WebTextLayout;
 
     fn build(self) -> Self::Out {
